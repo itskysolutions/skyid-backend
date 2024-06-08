@@ -14,9 +14,3 @@ export default class BcryptService {
   decode = (value: string) => bcrypt.hashSync(bcrypt.genSaltSync(10), value);
   compare = (value: string, hash: string) => bcrypt.compareSync(value, hash);
 }
-
-// export const encode = (value: string) => bcrypt.hashSync(value, bcrypt.genSaltSync(10));
-
-// export const decode = (value: string) => bcrypt.hashSync(bcrypt.genSaltSync(10), value);
-
-// export const compare = (value: string, oldValue: string) => bcrypt.compareSync(value, oldValue);

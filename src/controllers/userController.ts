@@ -1,7 +1,9 @@
 import { Response, Request, NextFunction } from "express";
 import validation from "../utils/validation";
 import User from "../models/userModel";
-// import BcryptService from "../utils/bcryptService";
+import BcryptService from "../utils/bcryptService";
+import { sendMail } from "../utils/sendMail";
+import { registration } from "../views/registration";
 
 export default class UserController {
   static async checkEmail(req: Request, res: Response, next: NextFunction) {
@@ -44,16 +46,42 @@ export default class UserController {
   static async signup(req: Request, res: Response, next: NextFunction) {
     const { firstName, lastName, email, password, phoneNumber, address, nin, currency } = req.body;
     try {
-      const { error } = validation.signIn({ email, password });
+      const { error } = validation.signup({
+        firstName,
+        lastName,
+        email,
+        password,
+        phoneNumber,
+        address,
+        nin,
+        currency,
+      });
       if (error) return res.status(400).send(error.details[0].message);
 
-      // ready to go
       let user = await User.findOne({ email });
       if (user) return res.status(400).send({ message: "User already registered." });
 
-      user = new User({ firstName, lastName, email, password, phoneNumber, address, nin, currency });
+      user = new User({
+        firstName,
+        lastName,
+        email,
+        password: BcryptService.getInstance().encode(password), // encrypt password
+        phoneNumber,
+        address,
+        nin,
+        currency,
+      });
 
       await user.save();
+
+      sendMail({
+        to: email,
+        from: "Kirani",
+        name: firstName,
+        subject: "Welcome to Kirani",
+        html: registration(firstName),
+        text: "",
+      });
 
       return res.status(201).json({ message: "success", data: "User created" });
     } catch (error) {

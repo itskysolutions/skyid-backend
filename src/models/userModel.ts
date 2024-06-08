@@ -1,4 +1,3 @@
-// const mongoose = require("mongoose");
 import { model, Schema } from "mongoose";
 import { IUser } from "../types";
 
@@ -9,7 +8,11 @@ const userSchema = new Schema<IUser>({
   email: String,
   password: String,
   phoneNumber: String,
-  address: String,
+  address: {
+    street: String,
+    state: String,
+    country: String,
+  },
   nin: String,
   currency: String,
   date: { type: Date, default: Date.now },
@@ -19,21 +22,3 @@ const userSchema = new Schema<IUser>({
 const User = model("users", userSchema);
 
 export default User;
-
-// // 4 Create a user
-// async function createUser() {
-//   const auth = new User({
-//     email: "bawasuru@gmail.com",
-//     tags: ["node", "backend"],
-//     isPublished: true,
-//   });
-
-//   try {
-//     const result = await auth.save();
-//     console.log(result, "save sucesss");
-//   } catch (error) {
-//     console.log(error, "not working");
-//   }
-// }
-
-// createUser();

@@ -4,7 +4,7 @@ import { IMail } from "../types";
 
 dotenv.config();
 
-export const sendMail = async ({ to, name, subject, html, text }: IMail) => {
+export const sendMail = async ({ to, from, name, subject, html, text }: IMail) => {
   const { AUTH_EMAIL, AUTH_PASSWORD, EMAIL_SERVICE } = process.env;
 
   let transporter = nodemailer.createTransport({
@@ -16,19 +16,17 @@ export const sendMail = async ({ to, name, subject, html, text }: IMail) => {
   });
 
   const mailOptions = {
-    from: '"no-reply" <noreply@jega.io>',
+    from: `${from || "no-reply"} <noreply@karani.com>`,
     to: to,
-    subject: subject || "Registration Success",
-    html: html || `<body><h2>Hello ${name}! </h2><p>We're glad to have you on board at Jega. </p></body>`,
+    subject: subject,
+    html: html,
   };
 
   transporter.sendMail(mailOptions, (error) => {
     if (error) {
       console.log("Error sending email", error);
-      // res?.status(400).send({ message: "Error sending email", data: error });
     } else {
       console.log("Email Sent!", error);
-      // res?.status(200).json({ message: "Email Sent!" });
     }
   });
 };
