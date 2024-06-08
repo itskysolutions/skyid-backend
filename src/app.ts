@@ -7,7 +7,7 @@ import routers from "./routes";
 dotenv.config();
 
 const app: Application = express();
-const port: number = (process.env.PORT as never) || 9001;
+const port: number = (process.env.PORT as never) || 8000;
 
 // * Middleware
 app.use(express.json());
