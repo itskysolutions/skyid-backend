@@ -8,6 +8,14 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
+
+// Extend the Request interface to include user property
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: any;
+  }
+}
+
 export default class UserController {
   static async checkEmail(req: Request, res: Response, next: NextFunction) {
     const { email } = req.body;
@@ -107,6 +115,15 @@ export default class UserController {
       const token = jwt.sign({ _id: user._id }, process.env.JWT_PRIVATE_KEY as string);
 
       return res.status(200).json({ message: "success", accessToken: token });
+    } catch (error) {
+      return res.status(500).json({ message: error });
+    }
+  }
+
+  static async userProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const profileData = await User.findById(req.user?._id).select("-password -__v");
+      return res.status(200).json({ message: "success", data: profileData });
     } catch (error) {
       return res.status(500).json({ message: error });
     }
