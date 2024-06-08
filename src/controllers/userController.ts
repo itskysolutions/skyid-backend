@@ -4,7 +4,10 @@ import User from "../models/userModel";
 import BcryptService from "../utils/bcryptService";
 import { sendMail } from "../utils/sendMail";
 import { registration } from "../views/registration";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
+dotenv.config();
 export default class UserController {
   static async checkEmail(req: Request, res: Response, next: NextFunction) {
     const { email } = req.body;
@@ -43,7 +46,7 @@ export default class UserController {
     }
   }
 
-  static async signup(req: Request, res: Response, next: NextFunction) {
+  static async signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, phoneNumber, address, nin, currency } = req.body;
     try {
       const { error } = validation.signup({
@@ -89,7 +92,7 @@ export default class UserController {
     }
   }
 
-  static async signin(req: Request, res: Response, next: NextFunction) {
+  static async signin(req: Request, res: Response) {
     const { email, password } = req.body;
     try {
       const { value, error } = validation.signIn({ email, password });
@@ -98,21 +101,17 @@ export default class UserController {
       let user = await User.findOne({ email: req.body.email });
       if (!user) return res.status(400).send({ message: "Invalid email or password." });
 
-      // const validPassword = await bcrypt.compare(req.body.password, user.password);
-      // if (!validPassword) return res.status(400).send({ message: "Invalid email or password." });
+      if (!BcryptService.getInstance().compare(password, user.password as string))
+        return res.status(400).send({ message: "Invalid email or password." });
 
-      // // const token = jwt.sign({ _id: user._id }, config.get("jwtPrivateKey"));
-      // const token = user.generateAuthToken();
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_PRIVATE_KEY as string);
 
-      // res.send({ message: "success", data: token });
-
-      return res.status(200).json({ message: "success", data: value });
+      return res.status(200).json({ message: "success", accessToken: token });
     } catch (error) {
       return res.status(500).json({ message: error });
     }
-
-    next();
   }
+
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
     const { email } = req.body;
     try {
