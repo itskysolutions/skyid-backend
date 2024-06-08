@@ -2,10 +2,12 @@
   "name": "karani",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.ts",
   "scripts": {
-    "start": "node ./src/app.js",
-    "dev": "nodemon ./src/app.ts",
+    "build": "npx tsc",
+    "watch": "tsc -w",
+    "start": "nodemon app.ts",
+    "dev": "nodemon app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

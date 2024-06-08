@@ -1,8 +1,8 @@
 import express, { Application } from "express";
 import dotenv from "dotenv";
-import { database } from "./config/db";
-import homeRoute from "./routes/homeRoutes";
-import routers from "./routes";
+import { database } from "./src/config/db";
+import homeRoute from "./src/routes/homeRoutes";
+import routers from "./src/routes";
 
 dotenv.config();
 
