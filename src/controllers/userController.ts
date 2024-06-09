@@ -1,11 +1,14 @@
+import bcrypt from "bcrypt";
 import { Response, Request, NextFunction } from "express";
 import validation from "../utils/validation";
 import User from "../models/userModel";
-import BcryptService from "../utils/bcryptService";
+import Bcrypt from "../utils/bcryptService";
 import { sendMail } from "../utils/sendMail";
-import { registration } from "../views/registration";
+import { forgotPasswordTemplate, registration, resetPasswordTemplate } from "../views/registration";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import Otp from "../models/otpModels";
+import { generateOtp } from "../utils/generateOtp";
 
 dotenv.config();
 
@@ -76,7 +79,7 @@ export default class UserController {
         firstName,
         lastName,
         email,
-        password: BcryptService.getInstance().encode(password), // encrypt password
+        password: Bcrypt.shared().encode(password), // encrypt password
         phoneNumber,
         address,
         nin,
@@ -109,7 +112,7 @@ export default class UserController {
       let user = await User.findOne({ email: req.body.email });
       if (!user) return res.status(400).send({ message: "Invalid email or password." });
 
-      if (!BcryptService.getInstance().compare(password, user.password as string))
+      if (!Bcrypt.shared().compare(password, user.password as string))
         return res.status(400).send({ message: "Invalid email or password." });
 
       const token = jwt.sign({ _id: user._id }, process.env.JWT_PRIVATE_KEY as string);
@@ -129,34 +132,84 @@ export default class UserController {
     }
   }
 
-  async forgotPassword(req: Request, res: Response, next: NextFunction) {
-    const { email } = req.body;
+  static async forgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
+      const { email } = req.body;
       const { value, error } = validation.forgotPassword({ email });
       if (error) return res.status(400).send(error.details[0].message);
 
-      // ready to go
-      return res.status(200).json({ message: "success/forgot", data: value });
+      let user = await User.findOne({ email: value.email });
+      if (!user) return res.status(400).send({ message: "User does not exist" });
+
+      // clear any old record
+      await Otp.deleteOne({ email: user.email });
+
+      const getOtp = generateOtp();
+      await new Otp({
+        email,
+        otp: Bcrypt.shared().encode(getOtp),
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 5_00_000,
+      }).save();
+
+      sendMail({
+        to: email,
+        from: "Kirani",
+        name: user.firstName as string,
+        subject: "Reset Password",
+        html: forgotPasswordTemplate(user.firstName as string, getOtp),
+        text: "",
+      });
+
+      return res.status(200).json({ message: "success" });
     } catch (error) {
-      return res.status(500).json({ message: error });
+      return res.status(500).json({ message: "Internal Service Error" });
     }
 
     next();
   }
 
-  async resetPassword(req: Request, res: Response, next: NextFunction) {
-    const { email, password } = req.body;
+  static async resetPassword(req: Request, res: Response, next: NextFunction) {
+    const { email, otp, password } = req.body;
     try {
-      const { value, error } = validation.signIn({ email, password });
+      const { value, error } = validation.resetPassword({ email, password, otp });
       if (error) return res.status(400).send(error.details[0].message);
 
-      // ready to go
-      return res.status(200).json({ message: "success/reset", data: value });
+      let user = await User.findOne({ email: value.email });
+      if (!user) return res.status(400).send({ message: "Email does not exist." });
+
+      const getOtp = await Otp.findOne({ email: value.email });
+      if (!getOtp) return res.status(400).send({ message: "No otp records found" });
+
+      // checking for expired code
+      const { expiresAt } = getOtp;
+      if (Number(expiresAt) < Date.now()) {
+        await Otp.deleteOne({ email: value.email });
+        return res.status(400).send({ message: "Code has expired. Request for a new one." });
+      }
+
+      //comparing otp
+      if (!Bcrypt.shared().compare(otp, getOtp.otp)) return res.status(400).send({ message: "Invalid otp code." });
+
+      // updating password
+      await User.updateOne({ email: value.email }, { password: Bcrypt.shared().encode(value.password) });
+      // clear any old record
+      await Otp.deleteOne({ email: user.email });
+
+      // send email
+      sendMail({
+        to: email,
+        from: "Kirani",
+        name: user.firstName as string,
+        subject: "Password Reset Successful",
+        html: resetPasswordTemplate(user.firstName as string),
+        text: "",
+      });
+
+      return res.status(200).json({ message: "success" });
     } catch (error) {
       return res.status(500).json({ message: error });
     }
-
-    next();
   }
 }
 

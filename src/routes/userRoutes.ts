@@ -9,7 +9,7 @@ UserRoutes.post("/check-phone", UserController.checkPhoneNumber);
 UserRoutes.post("/signup", UserController.signup);
 UserRoutes.post("/signin", UserController.signin);
 UserRoutes.get("/user-profile", validateToken, UserController.userProfile);
-// UserRoutes.post("/forgot-password", UserController.forgotPassword);
-// UserRoutes.post("/reset-password", UserController.resetPassword);
+UserRoutes.post("/forgot-password", UserController.forgotPassword);
+UserRoutes.post("/reset-password", UserController.resetPassword);
 
 export default UserRoutes;

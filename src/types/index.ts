@@ -26,6 +26,14 @@ export interface IMail {
   text: string;
 }
 
+export interface IOtp {
+  email: string;
+  otp: string;
+  password: string;
+  createdAt?: Date;
+  expiresAt?: Date;
+}
+
 // Define a custom request type that includes a user property
 export interface AuthenticatedRequest extends Request {
   user?: {

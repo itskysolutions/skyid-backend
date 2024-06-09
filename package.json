@@ -2,11 +2,11 @@
   "name": "karani",
   "version": "1.0.0",
   "description": "",
-  "main": "app.ts",
+  "main": "index.js",
   "scripts": {
-    "build": "npx tsc",
+    "build": "tsc ./app.ts --outDir build",
     "watch": "tsc -w",
-    "start": "nodemon app.ts",
+    "start": "node ./build/index.js",
     "dev": "nodemon app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^9.0.6",

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { database } from "./src/config/db";
 import homeRoute from "./src/routes/homeRoutes";
 import routers from "./src/routes";
+import cors from "cors";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const port: number = (process.env.PORT as never) || 8000;
 
 // * Middleware
 app.use(express.json());
+app.use(cors());
 
 // * Routes
 app.use(homeRoute);
