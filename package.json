@@ -2,16 +2,17 @@
   "name": "karani",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "app.ts",
   "scripts": {
-    "dev": "nodemon --watch './**/*.ts' --exec ts-node ./src/app.ts",
+    "dev": "nodemon --watch './**/*.ts' --exec ts-node --loader ts-node/esm src/app.ts",
     "build": "npx tsc",
-    "start": "node src/app.ts",
+    "start": "ts-node src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "module": "commonjs",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
@@ -20,6 +21,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.13.0",
     "@types/nodemailer": "^6.4.15",
+    "esm": "^3.2.25",
     "joi": "^17.13.1",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.2",
