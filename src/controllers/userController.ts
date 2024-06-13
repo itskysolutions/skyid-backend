@@ -23,19 +23,18 @@ export default class UserController {
   static async checkEmail(req: Request, res: Response, next: NextFunction) {
     const { email } = req.body;
     try {
+      console.log(email, "from the server email");
       const { error } = validation.checkEmail(email);
       if (error) return res.status(400).send(error.details[0].message);
 
-      // ready to go
       let user = await User.findOne({ email });
-      if (user) {
-        res.status(400).send({ message: "email is already taken." });
-      } else {
-        return res.status(201).json({ message: "success", data: "available" });
-      }
+      if (user) return res.status(400).send({ message: "email is already taken." });
+
+      res.status(201).json({ message: "success", data: "available" });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
+    next();
   }
 
   static async checkPhoneNumber(req: Request, res: Response, next: NextFunction) {
@@ -73,7 +72,7 @@ export default class UserController {
       if (error) return res.status(400).send(error.details[0].message);
 
       let user = await User.findOne({ email });
-      if (user) return res.status(400).send({ message: "User already registered." });
+      if (user) return res.status(409).send({ message: "User already registered." });
 
       user = new User({
         firstName,
@@ -165,8 +164,6 @@ export default class UserController {
     } catch (error) {
       return res.status(500).json({ message: "Internal Service Error" });
     }
-
-    next();
   }
 
   static async resetPassword(req: Request, res: Response, next: NextFunction) {
