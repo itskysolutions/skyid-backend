@@ -23,7 +23,6 @@ export default class UserController {
   static async checkEmail(req: Request, res: Response, next: NextFunction) {
     const { email } = req.body;
     try {
-      console.log(email, "from the server email");
       const { error } = validation.checkEmail(email);
       if (error) return res.status(400).send(error.details[0].message);
 
@@ -65,9 +64,6 @@ export default class UserController {
         email,
         password,
         phoneNumber,
-        address,
-        nin,
-        currency,
       });
       if (error) return res.status(400).send(error.details[0].message);
 
@@ -80,18 +76,15 @@ export default class UserController {
         email,
         password: Bcrypt.shared().encode(password), // encrypt password
         phoneNumber,
-        address,
-        nin,
-        currency,
       });
 
       await user.save();
 
       sendMail({
         to: email,
-        from: "Kirani",
+        from: "AGIS",
         name: firstName,
-        subject: "Welcome to Kirani",
+        subject: "Welcome to AGIS",
         html: registration(firstName),
         text: "",
       });

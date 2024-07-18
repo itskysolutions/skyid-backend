@@ -8,13 +8,6 @@ const userSchema = new Schema<IUser>({
   email: String,
   password: String,
   phoneNumber: String,
-  address: {
-    street: String,
-    state: String,
-    country: String,
-  },
-  nin: String,
-  currency: String,
   date: { type: Date, default: Date.now },
 });
 

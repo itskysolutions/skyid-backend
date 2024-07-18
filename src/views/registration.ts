@@ -1,10 +1,17 @@
 export const registration = (name: string) => {
   return `<body>
   <h4>Hello ${name},</h4>
-  <h2>Welcome to Kirani 😀</h2>
-  <p>Thank you for joining us. With Kirani, you can make international calls to anywhere in the world, connecting you with friends, family, and business partners effortlessly. We’re excited to have you on board and look forward to providing you with the best calling experience.</p>
-  <p>Happy calling!</p>
-  <p>The Kirani Team</p>
+  <h2>Welcome to Abuja Geographic Information Systems (AGIS)! 😀</h2>
+  <p>We are delighted to have you on board. As a registered user, you now have access to a wealth of geographic information and services that can help you explore, understand, and utilize spatial data related to Abuja.</p>
+  <p>Here are some of the features and services you can enjoy:</p>
+  <p>Access to detailed maps and geographic data of Abuja<br/>
+    Property search and verification<br/>
+    Land ownership and title information<br/>
+    GIS tools for analysis and planning<br/>
+    We are committed to providing you with the best possible experience. If you have any questions or need assistance, our support team is here to help. Feel free to reach out to us at [Support Email] or call us at [Support Phone Number].</p>
+  <p>Thank you for joining AGIS. We look forward to serving you and helping you make the most of our geographic information systems.</p>
+  <p>Best regards,</p>
+  <p>The AGIS Team</p>
   </body>`;
 };
 
