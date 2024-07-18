@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.ts",
-  "type": "commonjs",
+  "module": "commonjs",
   "scripts": {
     "dev": "nodemon --watch './**/*.ts' --exec ts-node app.ts",
     "build": "npx tsc",
