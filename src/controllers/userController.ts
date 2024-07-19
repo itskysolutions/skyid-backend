@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import { Response, Request, NextFunction } from "express";
 import validation from "../utils/validation";
 import User from "../models/userModel";
