@@ -36,3 +36,16 @@ export const resetPasswordTemplate = (name: string) => {
   <p>Best regards,<br/>Kirani Support Team</p>
   </body>`;
 };
+
+export const verifyEmailTemplate = (name: string, otp: string) => {
+  return `<body>
+  <h4>Hello ${name},</h4>
+  <h2>Verify otp code</h2>
+  <p>Please use the One-Time Password (OTP) provided below to verify your account.</p>
+  <p>Your OTP: ${otp}</p>
+  <p>This OTP is valid for the next 10 minutes. For security reasons, do not share this OTP with anyone.</p>
+  <p>If you did not request a password reset, please ignore this email. Your account will remain secure.</p>
+  <p>Best regards,</p>
+  <p>The AGIS Team</p>
+  </body>`;
+};

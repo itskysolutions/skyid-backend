@@ -3,11 +3,17 @@ import validation from "../utils/validation";
 import User from "../models/userModel";
 import Bcrypt from "../utils/bcryptService";
 import { sendMail } from "../utils/sendMail";
-import { forgotPasswordTemplate, registration, resetPasswordTemplate } from "../views/registration";
+import {
+  forgotPasswordTemplate,
+  registration,
+  resetPasswordTemplate,
+  verifyEmailTemplate,
+} from "../views/registration";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import Otp from "../models/otpModels";
 import { generateOtp } from "../utils/generateOtp";
+import generate from "../utils/generate";
 
 dotenv.config();
 
@@ -123,6 +129,76 @@ export default class UserController {
     }
   }
 
+  static async verifyUserEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      const { value, error } = validation.forgotPassword({ email });
+      if (error) return res.status(400).send(error.details[0].message);
+
+      let user = await User.findOne({ email: value.email });
+      if (!user) return res.status(400).send({ message: "User does not exist" });
+
+      // clear any old record
+      await Otp.deleteOne({ email: user.email });
+
+      const getOtp = generate.otp();
+      await new Otp({
+        email,
+        otp: Bcrypt.shared().encode(getOtp),
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 5_00_000,
+      }).save();
+
+      // send email
+      sendMail({
+        to: email,
+        from: "AGIS",
+        name: user.firstName as string,
+        subject: "Verify Otp code",
+        html: verifyEmailTemplate(user.firstName as string, getOtp as never),
+        text: "",
+      });
+
+      return res.status(200).json({ message: "success" });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Service Error" });
+    }
+  }
+
+  static async confirmUserEmail(req: Request, res: Response, next: NextFunction) {
+    const { email, otp } = req.body;
+    try {
+      const { value, error } = validation.confirmEmail({ email, otp });
+      if (error) return res.status(400).send(error.details[0].message);
+
+      let user = await User.findOne({ email: value.email });
+      if (!user) return res.status(400).send({ message: "Email does not exist." });
+
+      const getOtp = await Otp.findOne({ email: value.email });
+      if (!getOtp) return res.status(400).send({ message: "No otp records found" });
+
+      // checking for expired code
+      const { expiresAt } = getOtp;
+      if (Number(expiresAt) < Date.now()) {
+        await Otp.deleteOne({ email: value.email });
+        return res.status(400).send({ message: "Code has expired. Request for a new one." });
+      }
+
+      //comparing otp
+      if (!Bcrypt.shared().compare(otp, getOtp.otp)) return res.status(400).send({ message: "Invalid otp code." });
+
+      // updating account type
+      // await User.updateOne({ email }, { accountType: "Tier 1" });
+
+      // clear any old record
+      await Otp.deleteOne({ email: user.email });
+
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_PRIVATE_KEY as string);
+      return res.status(200).json({ message: "success", token });
+    } catch (error) {
+      return res.status(500).json({ message: error });
+    }
+  }
   static async forgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email } = req.body;

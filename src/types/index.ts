@@ -30,6 +30,10 @@ export interface IOtp {
   createdAt?: Date;
   expiresAt?: Date;
 }
+export interface ICheckEmail {
+  email: string;
+  otp: string;
+}
 
 // Define a custom request type that includes a user property
 export interface AuthenticatedRequest extends Request {

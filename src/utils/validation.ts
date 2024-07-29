@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { IOtp, IUser } from "../types";
+import { ICheckEmail, IOtp, IUser } from "../types";
 
 export const validation = {
   checkEmail: (email: string) => {
@@ -113,6 +113,13 @@ export const validation = {
     return Joi.object({
       email: Joi.string().email().required(),
     }).validate(forgotPassword);
+  },
+
+  confirmEmail: (payload: ICheckEmail) => {
+    return Joi.object({
+      email: Joi.string().email().required(),
+      otp: Joi.string().min(6).required(),
+    }).validate(payload);
   },
 
   resetPassword: (payload: IOtp) => {
