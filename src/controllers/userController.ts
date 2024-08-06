@@ -187,9 +187,6 @@ export default class UserController {
       //comparing otp
       if (!Bcrypt.shared().compare(otp, getOtp.otp)) return res.status(400).send({ message: "Invalid otp code." });
 
-      // updating account type
-      // await User.updateOne({ email }, { accountType: "Tier 1" });
-
       // clear any old record
       await Otp.deleteOne({ email: user.email });
 
@@ -277,42 +274,3 @@ export default class UserController {
     }
   }
 }
-
-//@desc Post signin
-//@route POST /api/auth/signup
-//@access public
-
-//@desc Post signin
-//@route POST /api/auth/signup
-//@access public
-// const signin = async (req: Request, res: Response, next: NextFunction) => {
-//   const { email, password } = req.body;
-//   try {
-//     const { value, error } = validation.signIn({ email, password });
-//     if (error) return res.status(400).send(error.details[0].message);
-
-//     // ready to go
-//     return res.status(200).json({ message: "success", data: value });
-//   } catch (error) {
-//     console.log(error, "here");
-//     return res.status(500).json({ message: error });
-//   }
-
-//   next();
-// };
-
-// const forgotPassword = (req: Request, res: Response) => {
-//   const { email } = req.body;
-//   try {
-//     const { value, error } = validation.forgotPassword({ email });
-//     if (error) return res.status(400).send(error.details[0].message);
-//     return res.status(200).json({ message: "success", data: value });
-//   } catch (error) {
-//     console.log("Server error 500");
-//     return res.status(500).json({ message: "Server error" });
-//   }
-// };
-
-// const resetPassword = (req: Request, res: Response) => {
-//   return res.status(200).json({ message: "reset" });
-// };
