@@ -1,9 +1,9 @@
-import express from "express";
-import SMSController from "../controllers/smsController";
+// import express from "express";
+// import SMSController from "../controllers/smsController";
 
-const SMSRoutes = express.Router();
+// const SMSRoutes = express.Router();
 
-SMSRoutes.post("/send-sms", SMSController.sendSms);
-SMSRoutes.get("/sms-vault", SMSController.checkBalance);
+// SMSRoutes.post("/send-sms", SMSController.sendSms);
+// SMSRoutes.get("/sms-vault", SMSController.checkBalance);
 
-export default SMSRoutes;
+// export default SMSRoutes;
