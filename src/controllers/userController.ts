@@ -61,7 +61,7 @@ export default class UserController {
   }
 
   static async signup(req: Request, res: Response) {
-    const { firstName, lastName, email, password, phoneNumber, address, nin, currency } = req.body;
+    const { firstName, lastName, email, password, phoneNumber } = req.body;
     try {
       const { error } = validation.signup({
         firstName,
@@ -196,6 +196,7 @@ export default class UserController {
       return res.status(500).json({ message: error });
     }
   }
+
   static async forgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email } = req.body;
@@ -218,7 +219,7 @@ export default class UserController {
 
       sendMail({
         to: email,
-        from: "Kirani",
+        from: "AGIS",
         name: user.firstName as string,
         subject: "Reset Password",
         html: forgotPasswordTemplate(user.firstName as string, getOtp),
