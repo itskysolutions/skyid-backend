@@ -1,17 +1,21 @@
 export interface IUser {
   firstName?: string;
   lastName?: string;
-  business?: string;
-
-  nin?: string;
-  address?: string;
-  contactNumber?: string;
-
+  country?: string;
+  businessName?: string;
+  businessType?: string;
+  agentCode?: string;
   email: string;
-  password?: string;
   phoneNumber?: string;
+  password?: string;
+  verified?: string;
+
   date?: Date;
   accountType?: string;
+
+  // nin?: string;
+  // address?: string;
+  // contactNumber?: string;
 }
 
 export interface IPhoneNumber {

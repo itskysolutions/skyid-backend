@@ -60,6 +60,23 @@ export const validation = {
           "string.empty": "Phone number is required",
           "any.required": "Phone number is required",
         }),
+      country: Joi.string()
+        .messages({
+          "any.required": "Country is required",
+        })
+        .required(),
+      businessName: Joi.string().messages({
+        "any.required": "Business name is required",
+      }),
+      businessType: Joi.string().messages({
+        "any.required": "Business type is required",
+      }),
+      accountType: Joi.string().messages({
+        "any.required": "Business type is required",
+      }),
+      agentCode: Joi.string().messages({
+        "any.required": "Agent code is required",
+      }),
     }).validate(signup);
   },
 

@@ -8,7 +8,8 @@ UserRoutes.post("/signin", UserController.signin);
 UserRoutes.post("/send-otp", UserController.verifyUserEmail);
 UserRoutes.post("/verify-otp", UserController.confirmUserEmail);
 
-// UserRoutes.post("/check-email", UserController.checkEmail);
+UserRoutes.post("/check-email", UserController.checkEmail);
+UserRoutes.post("/verify-email", UserController.verifyNewUser);
 UserRoutes.post("/signup", UserController.signup);
 UserRoutes.get("/user-profile", validateToken, UserController.userProfile);
 
