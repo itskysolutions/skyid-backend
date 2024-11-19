@@ -6,14 +6,16 @@ export const validation = {
     return Joi.string().email().validate(email);
   },
 
-  checkPhoneNumber: (phoneNumber: string) => {
-    return Joi.string()
-      .pattern(/^\d+$/)
-      .messages({
-        "string.pattern.base": "Phone number must contain only digits.",
-        "string.empty": "Phone number is required.",
-      })
-      .validate(phoneNumber);
+  checkPhoneNumber: (number: string) => {
+    return (
+      Joi.string()
+        // .pattern(/^\d+$/)
+        .messages({
+          "string.pattern.base": "Phone number must contain only digits.",
+          "string.empty": "Phone number is required.",
+        })
+        .validate(number)
+    );
   },
 
   signIn: (signin: IUser) => {

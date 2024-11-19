@@ -24,16 +24,16 @@ export const forgotPasswordTemplate = (name: string, otp: string) => {
   <p>This OTP is valid for the next 10 minutes. For security reasons, do not share this OTP with anyone.</p>
   <p>If you did not request a password reset, please ignore this email. Your account will remain secure.</p>
   <p>Best regards,</p>
-  <p>Kirani Support Team</p>
+  <p>SKYID support Team</p>
   </body>`;
 };
 export const resetPasswordTemplate = (name: string) => {
   return `<body>
   <h4>Hello ${name},</h4>
   <h2>Password Reset Successful</h2>
-  <p>Your Kirani account password has been successfully reset.</p>
+  <p>Your SkyID account password has been successfully reset.</p>
   <p>You can now log in to your account using your new password. If you did not request this change or believe an unauthorized person has accessed your account, please contact our support team immediately.</p>
-  <p>Best regards,<br/>Kirani Support Team</p>
+  <p>Best regards,<br/>SKYID Support Team</p>
   </body>`;
 };
 
@@ -46,6 +46,6 @@ export const verifyEmailTemplate = (name: string, otp: string) => {
   <p>This OTP is valid for the next 10 minutes. For security reasons, do not share this OTP with anyone.</p>
   <p>If you did not request a password reset, please ignore this email. Your account will remain secure.</p>
   <p>Best regards,</p>
-  <p>The AGIS Team</p>
+  <p>The SKYID Team</p>
   </body>`;
 };

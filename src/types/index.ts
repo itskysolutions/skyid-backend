@@ -1,10 +1,28 @@
 export interface IUser {
   firstName?: string;
   lastName?: string;
+  business?: string;
+
+  nin?: string;
+  address?: string;
+  contactNumber?: string;
+
   email: string;
   password?: string;
   phoneNumber?: string;
   date?: Date;
+  accountType?: string;
+}
+
+export interface IPhoneNumber {
+  number: string;
+  accountId: string;
+  amount: number;
+  available: string;
+  billingPass: string;
+  agentOwner: string | null;
+  usedBy: string;
+  date: Date;
 }
 
 export interface IAddress {

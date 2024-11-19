@@ -14,6 +14,7 @@ import dotenv from "dotenv";
 import Otp from "../models/otpModels";
 import { generateOtp } from "../utils/generateOtp";
 import generate from "../utils/generate";
+import PhoneNumber from "../models/numbersModel";
 
 dotenv.config();
 
@@ -41,24 +42,21 @@ export default class UserController {
     next();
   }
 
-  static async checkPhoneNumber(req: Request, res: Response, next: NextFunction) {
-    const { phoneNumber } = req.body;
-    try {
-      const { error } = validation.checkPhoneNumber(phoneNumber);
-      if (error) return res.status(400).send(error.details[0].message);
+  // static async checkPhoneNumber(req: Request, res: Response, next: NextFunction) {
+  //   const { number } = req.body;
+  //   try {
+  //     const { error } = validation.checkPhoneNumber(number);
+  //     if (error) return res.status(400).send(error.details[0].message);
 
-      // ready to go
-      let user = await User.findOne({ phoneNumber });
-      if (user) {
-        res.status(400).send({ message: "phone number exists." });
-      } else {
-        return res.status(201).json({ message: "success", data: "available" });
-      }
-    } catch (error) {
-      console.log(error, "error");
-      return res.status(500).json({ message: "Internal Server Error!" });
-    }
-  }
+  //     const payload = { number: "07003109616" };
+  //     let user = await PhoneNumber.findOne(payload);
+  //     if (user) return res.status(409).send({ message: "number is already taken by another customer." });
+
+  //     return res.status(201).json({ message: "success", data: "number is available" });
+  //   } catch (error) {
+  //     return res.status(500).json({ message: "Internal Server Error!" });
+  //   }
+  // }
 
   static async signup(req: Request, res: Response) {
     const { firstName, lastName, email, password, phoneNumber } = req.body;
@@ -87,9 +85,9 @@ export default class UserController {
 
       sendMail({
         to: email,
-        from: "AGIS",
+        from: "Skyid",
         name: firstName,
-        subject: "Welcome to AGIS",
+        subject: "Welcome to SKYID",
         html: registration(firstName),
         text: "",
       });
@@ -129,6 +127,19 @@ export default class UserController {
     }
   }
 
+  static async getUsersByEmail(req: Request, res: Response, next: NextFunction) {
+    const { number } = req.params;
+    try {
+      const users = await PhoneNumber.find({ number });
+      if (!users.length) {
+        return res.status(404).json({ message: "Phone number is available." });
+      }
+      return res.status(200).json({ message: "Phone is taken already", data: users });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!", error });
+    }
+  }
+
   static async verifyUserEmail(req: Request, res: Response, next: NextFunction) {
     try {
       const { email } = req.body;
@@ -152,7 +163,7 @@ export default class UserController {
       // send email
       sendMail({
         to: email,
-        from: "AGIS",
+        from: "SkyID",
         name: user.firstName as string,
         subject: "Verify Otp code",
         html: verifyEmailTemplate(user.firstName as string, getOtp as never),
@@ -219,7 +230,7 @@ export default class UserController {
 
       sendMail({
         to: email,
-        from: "AGIS",
+        from: "SKYID",
         name: user.firstName as string,
         subject: "Reset Password",
         html: forgotPasswordTemplate(user.firstName as string, getOtp),
@@ -262,7 +273,7 @@ export default class UserController {
       // send email
       sendMail({
         to: email,
-        from: "Kirani",
+        from: "SKYID",
         name: user.firstName as string,
         subject: "Password Reset Successful",
         html: resetPasswordTemplate(user.firstName as string),

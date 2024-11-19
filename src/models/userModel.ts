@@ -6,8 +6,13 @@ const userSchema = new Schema<IUser>({
   firstName: String,
   lastName: String,
   email: String,
+  business: String,
+  nin: String,
+  address: String,
+  contactNumber: String,
   password: String,
   phoneNumber: String,
+  accountType: String,
   date: { type: Date, default: Date.now },
 });
 
