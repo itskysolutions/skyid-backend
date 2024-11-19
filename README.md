@@ -1,13 +1,13 @@
-# kirani-backend
+# SkyID-backend
 
-Welcome to the Kirani Project! This repository contains several services that collectively form the Kirani application. Follow the steps below to set up each service to run locally.
+Welcome to the SKYID Project! This repository contains several services that collectively form the SKYID application. Follow the steps below to set up each service to run locally.
 
 ## Getting Started
 
 1. Clone the repository to your local machine using the following command:
 
    ```
-   git clone https://github.com/amalikmuhd/kirani-backend.git
+   git clone https://github.com/itskysolutions/skyid-backend.git
    ```
 
 2. Change directory into each service:
