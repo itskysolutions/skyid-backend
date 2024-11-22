@@ -27,7 +27,7 @@ declare module "express-serve-static-core" {
 
 export default class UserController {
   static async checkEmail(req: Request, res: Response, next: NextFunction) {
-    const { email } = req.body;
+    const { email, firstName } = req.body;
     try {
       const { error } = validation.checkEmail(email);
       if (error) return res.status(400).send(error.details[0].message);
@@ -35,64 +35,86 @@ export default class UserController {
       let user = await User.findOne({ email });
       if (user) return res.status(400).send({ message: "email is already taken." });
 
-      res.status(201).json({ message: "success", data: "available" });
+      await Otp.deleteOne({ email });
+
+      const getOtp = generate.otp();
+      await new Otp({
+        email,
+        otp: Bcrypt.shared().encode(getOtp),
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 5_00_000,
+      }).save();
+
+      sendMail({
+        to: email,
+        from: "SkyID",
+        name: firstName,
+        subject: "Register Verify Otp code",
+        html: verifyEmailTemplate(firstName as string, getOtp as never),
+        text: "",
+      });
+
+      res.status(201).json({ message: "success" });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
     next();
   }
 
-  // static async checkPhoneNumber(req: Request, res: Response, next: NextFunction) {
-  //   const { number } = req.body;
-  //   try {
-  //     const { error } = validation.checkPhoneNumber(number);
-  //     if (error) return res.status(400).send(error.details[0].message);
-
-  //     const payload = { number: "07003109616" };
-  //     let user = await PhoneNumber.findOne(payload);
-  //     if (user) return res.status(409).send({ message: "number is already taken by another customer." });
-
-  //     return res.status(201).json({ message: "success", data: "number is available" });
-  //   } catch (error) {
-  //     return res.status(500).json({ message: "Internal Server Error!" });
-  //   }
-  // }
-
-  static async signup(req: Request, res: Response) {
-    const { firstName, lastName, email, password, phoneNumber } = req.body;
+  static async verifyNewUser(req: Request, res: Response, next: NextFunction) {
+    const { email, otp } = req.body;
     try {
-      const { error } = validation.signup({
-        firstName,
-        lastName,
-        email,
-        password,
-        phoneNumber,
-      });
+      const { value, error } = validation.confirmEmail({ email, otp });
       if (error) return res.status(400).send(error.details[0].message);
 
-      let user = await User.findOne({ email });
-      if (user) return res.status(409).send({ message: "User already registered." });
+      const getOtp = await Otp.findOne({ email: value.email });
+      if (!getOtp) return res.status(400).send({ message: "No otp records found" });
+
+      // checking for expired code
+      const { expiresAt } = getOtp;
+      if (Number(expiresAt) < Date.now()) {
+        await Otp.deleteOne({ email: value.email });
+        return res.status(400).send({ message: "Code has expired. Request for a new one." });
+      }
+
+      //comparing otp
+      if (!Bcrypt.shared().compare(otp, getOtp.otp)) return res.status(400).send({ message: "Invalid otp code." });
+
+      // clear any old record
+      await Otp.deleteOne({ email });
+      return res.status(200).json({ message: "success" });
+    } catch (error) {
+      return res.status(500).json({ message: error });
+    }
+  }
+
+  static async signup(req: Request, res: Response) {
+    try {
+      const { error } = validation.signup({ ...req.body });
+      if (error) return res.status(400).send(error.details[0].message);
+
+      let user = await User.findOne({ email: req.body.email });
+      if (user) return res.status(400).send({ message: "Email is taken already." });
 
       user = new User({
-        firstName,
-        lastName,
-        email,
-        password: Bcrypt.shared().encode(password), // encrypt password
-        phoneNumber,
+        ...req.body,
+        verified: "false",
+        password: Bcrypt.shared().encode(req.body.password), // encrypt password
       });
 
       await user.save();
 
       sendMail({
-        to: email,
+        to: req.body.email,
         from: "Skyid",
-        name: firstName,
+        name: req.body.firstName,
         subject: "Welcome to SKYID",
-        html: registration(firstName),
+        html: registration(req.body.firstName),
         text: "",
       });
 
-      return res.status(201).json({ message: "success", data: "User created" });
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_PRIVATE_KEY as string);
+      return res.status(200).json({ message: "success", token });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
@@ -101,7 +123,7 @@ export default class UserController {
   static async signin(req: Request, res: Response) {
     const { email, password } = req.body;
     try {
-      const { value, error } = validation.signIn({ email, password });
+      const { error } = validation.signIn({ email, password });
       if (error) return res.status(400).send(error.details[0].message);
 
       let user = await User.findOne({ email: req.body.email });
