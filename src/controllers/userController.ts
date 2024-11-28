@@ -15,6 +15,7 @@ import Otp from "../models/otpModels";
 import { generateOtp } from "../utils/generateOtp";
 import generate from "../utils/generate";
 import PhoneNumber from "../models/numbersModel";
+import Kyc from "../models/kycModel";
 
 dotenv.config();
 
@@ -305,6 +306,38 @@ export default class UserController {
       return res.status(200).json({ message: "success" });
     } catch (error) {
       return res.status(500).json({ message: error });
+    }
+  }
+
+  static async kyc(req: Request, res: Response) {
+    try {
+      const { error } = validation.kyc({ ...req.body });
+      if (error) return res.status(400).send(error.details[0].message);
+
+      // let user = await User.findOne({ email: req.body.email });
+      // if (user) return res.status(400).send({ message: "Email is taken already." });
+
+      // saving verified user
+      let kyc = new Kyc({ ...req.body });
+      await kyc.save();
+
+      // update user verified status
+      let user = new User({ verified: "true" });
+      await user.save();
+
+      // sending user an email confirming that his account has been verified
+      sendMail({
+        to: req.body.email,
+        from: "Skyid",
+        name: req.body.firstName,
+        subject: "Kyc is completed",
+        html: registration(req.body.firstName),
+        text: "",
+      });
+
+      return res.status(200).json({ message: "success" });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!" });
     }
   }
 }

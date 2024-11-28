@@ -5,7 +5,7 @@ export interface IUser {
   businessName?: string;
   businessType?: string;
   agentCode?: string;
-  email: string;
+  email?: string;
   phoneNumber?: string;
   password?: string;
   verified?: string;

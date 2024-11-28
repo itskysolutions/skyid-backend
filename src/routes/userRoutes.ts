@@ -17,4 +17,6 @@ UserRoutes.get("/user-profile", validateToken, UserController.userProfile);
 UserRoutes.post("/forgot-password", UserController.forgotPassword);
 UserRoutes.post("/reset-password", UserController.resetPassword);
 
+UserRoutes.post("/kyc", UserController.kyc);
+
 export default UserRoutes;

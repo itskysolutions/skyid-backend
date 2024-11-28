@@ -43,4 +43,14 @@ export default class NumberController {
     }
     next();
   }
+
+  static async buyNumber(req: Request, res: Response, next: NextFunction) {
+    try {
+      const guessedNumber = await User.findById(req.user?._id).select("-password -__v");
+      return res.status(200).json({ message: "success", data: guessedNumber });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!" });
+    }
+    next();
+  }
 }
