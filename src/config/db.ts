@@ -8,6 +8,6 @@ export const database = () => {
     mongoose.connect(process.env.MONGOOSE_URL as never);
     console.log("MongoDB is connected");
   } catch (error) {
-    console.log(error);
+    console.log(error, "error");
   }
 };
