@@ -49,3 +49,19 @@ export const verifyEmailTemplate = (name: string, otp: string) => {
   <p>The SKYID Team</p>
   </body>`;
 };
+
+export const kycHTML = (name: string) => {
+  return `<body>
+  <h4>Hello ${name},</h4>
+  <h2>Congratulations! Your KYC is Completed</h2>
+  
+  <p>We are pleased to inform you that your Know Your Customer (KYC) process has been successfully completed. This means your account is now fully verified, and you can enjoy all the features and services available to our registered users.</p>
+  
+  <p>With your KYC completed, you now have full access to all the services and features of your account. If you have any further questions or need assistance, please feel free to reach out to our support team.</p>
+  
+  <p>Thank you for your cooperation, and we look forward to continuing to serve you.</p>
+  
+  <p>Best regards,</p>
+  <p>The SKYID Team</p>
+  </body>`;
+};
