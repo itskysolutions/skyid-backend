@@ -3,6 +3,7 @@ import validation from "../utils/validation";
 import User from "../models/userModel";
 import dotenv from "dotenv";
 import UserNumber from "../models/numbersModel";
+import { IPhoneNumber } from "../types";
 
 dotenv.config();
 
@@ -38,20 +39,28 @@ export default class NumberController {
   }
 
   static async suggestNumber(req: Request, res: Response) {
-    const { number } = req.body;
+    const { count } = req.query;
     try {
-      // const { error } = validation.checkPhoneNumber(number);
-      // if (error) return res.status(400).send(error.details[0].message);
+      const suggestionCount = parseInt(count as string);
+      if (!Number.isInteger(suggestionCount)) {
+        return res.status(400).send({ message: "Invalid suggestion count" });
+      }
 
-      let userNumber = await UserNumber?.findOne({ number });
-      // not our number
-      if (!userNumber) return res.status(400).send({ message: "number does not exist" });
+      const suggestedNumbers: Array<IPhoneNumber> | undefined =
+        await UserNumber?.aggregate([
+          { $match: { available: true, usedBy: null, agentOwner: null } },
+          { $sample: { size: suggestionCount } }, // select random numbers
+        ]);
 
-      // is not available
-      if (!userNumber.available || userNumber.agentOwner)
-        return res.status(400).send({ message: "number is already taken", data: userNumber });
+      if (!suggestedNumbers || suggestedNumbers.length === 0) {
+        console.log(
+          "EMERGENCY: There are no available phone numbers in the database.",
+        );
+        return res.status(500).send({ message: "please try again later" });
+      }
 
-      return res.status(400).send({ message: "available" });
+      const data = suggestedNumbers.map((num) => num.number);
+      return res.status(200).send({ message: "success", data });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
@@ -59,7 +68,9 @@ export default class NumberController {
 
   static async buyNumber(req: Request, res: Response) {
     try {
-      const guessedNumber = await User.findById(req.user?._id).select("-password -__v");
+      const guessedNumber = await User.findById(req.user?._id).select(
+        "-password -__v",
+      );
       return res.status(200).json({ message: "success", data: guessedNumber });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
