@@ -9,13 +9,21 @@ export interface IUser {
   phoneNumber?: string;
   password?: string;
   verified?: string;
-
+  user_id?: any;
   date?: Date;
   accountType?: string;
 
   // nin?: string;
   // address?: string;
   // contactNumber?: string;
+}
+export interface IKYC {
+  user_id?: string;
+  phone?: string;
+  address?: string;
+  state?: string;
+  nin?: string;
+  date?: Date;
 }
 
 export interface IPhoneNumber {

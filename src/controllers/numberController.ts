@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from "express";
-import validation from "../utils/validation";
+// import validation from "../utils/validation";
 import User from "../models/userModel";
 import dotenv from "dotenv";
 import UserNumber from "../models/numbersModel";
@@ -14,43 +14,72 @@ declare module "express-serve-static-core" {
 }
 
 export default class NumberController {
-  static async checkNumber(req: Request, res: Response, next: NextFunction) {
+  static async checkNumber(req: Request, res: Response) {
     const { number } = req.body;
     try {
       // const { error } = validation.checkPhoneNumber(number);
       // if (error) return res.status(400).send(error.details[0].message);
 
-      // if (user)
-      let user = await UserNumber.findOne({ billingPass: "736770" });
-      console.log(user?.number, "user");
-      console.log(number, "checking numbers");
+      let userNumber = await UserNumber?.findOne({ number });
+      // not our number
+      if (!userNumber) return res.status(400).send({ message: "number does not exist" });
 
-      return res.status(400).send({ message: "phone is already taken." });
+      // is not available
+      if (!userNumber.available || userNumber.agentOwner)
+        return res.status(400).send({ message: "number is already taken", data: userNumber });
 
-      // res.status(201).json({ message: "success", data: user });
+      return res.status(400).send({ message: "available" });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
-    next();
   }
 
-  static async guessedNumbers(req: Request, res: Response, next: NextFunction) {
+  static async suggestNumber(req: Request, res: Response) {
+    const { number } = req.body;
+    try {
+      // const { error } = validation.checkPhoneNumber(number);
+      // if (error) return res.status(400).send(error.details[0].message);
+
+      let userNumber = await UserNumber?.findOne({ number });
+      // not our number
+      if (!userNumber) return res.status(400).send({ message: "number does not exist" });
+
+      // is not available
+      if (!userNumber.available || userNumber.agentOwner)
+        return res.status(400).send({ message: "number is already taken", data: userNumber });
+
+      return res.status(400).send({ message: "available" });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!" });
+    }
+  }
+
+  static async buyNumber(req: Request, res: Response) {
     try {
       const guessedNumber = await User.findById(req.user?._id).select("-password -__v");
       return res.status(200).json({ message: "success", data: guessedNumber });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
-    next();
   }
 
-  static async buyNumber(req: Request, res: Response, next: NextFunction) {
-    try {
-      const guessedNumber = await User.findById(req.user?._id).select("-password -__v");
-      return res.status(200).json({ message: "success", data: guessedNumber });
-    } catch (error) {
-      return res.status(500).json({ message: "Internal Server Error!" });
-    }
-    next();
-  }
+  // static async guessedNumbers(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const guessedNumber = await User.findById(req.user?._id).select("-password -__v");
+  //     return res.status(200).json({ message: "success", data: guessedNumber });
+  //   } catch (error) {
+  //     return res.status(500).json({ message: "Internal Server Error!" });
+  //   }
+  //   next();
+  // }
+
+  // static async buyNumber(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const guessedNumber = await User.findById(req.user?._id).select("-password -__v");
+  //     return res.status(200).json({ message: "success", data: guessedNumber });
+  //   } catch (error) {
+  //     return res.status(500).json({ message: "Internal Server Error!" });
+  //   }
+  //   next();
+  // }
 }

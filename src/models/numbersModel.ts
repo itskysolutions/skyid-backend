@@ -1,5 +1,10 @@
 import { model, Schema } from "mongoose";
+
+import { KiraniDatabase } from "../config/db";
+
 import { IPhoneNumber } from "../types";
+
+const connection = KiraniDatabase();
 
 // 2. Create a Schema corresponding to the document interface.
 const numberSchema = new Schema<IPhoneNumber>({
@@ -13,6 +18,11 @@ const numberSchema = new Schema<IPhoneNumber>({
 });
 
 // 3 Create a Model
-const UserNumber = model("phoneNumbers", numberSchema);
+const UserNumber = connection?.model("phoneNumbers", numberSchema);
 
 export default UserNumber;
+
+// const getKirani = async () => {
+//   try {
+//   } catch (error) {}
+// };
