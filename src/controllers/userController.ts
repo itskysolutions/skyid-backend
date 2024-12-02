@@ -5,6 +5,7 @@ import Bcrypt from "../utils/bcryptService";
 import { sendMail } from "../utils/sendMail";
 import {
   forgotPasswordTemplate,
+  kycHTML,
   registration,
   resetPasswordTemplate,
   verifyEmailTemplate,
@@ -150,18 +151,18 @@ export default class UserController {
     }
   }
 
-  static async getUsersByEmail(req: Request, res: Response, next: NextFunction) {
-    const { number } = req.params;
-    try {
-      const users = await PhoneNumber.find({ number });
-      if (!users.length) {
-        return res.status(404).json({ message: "Phone number is available." });
-      }
-      return res.status(200).json({ message: "Phone is taken already", data: users });
-    } catch (error) {
-      return res.status(500).json({ message: "Internal Server Error!", error });
-    }
-  }
+  // static async getUsersByEmail(req: Request, res: Response, next: NextFunction) {
+  //   const { number } = req.params;
+  //   try {
+  //     const users = await PhoneNumber.find({ number });
+  //     if (!users.length) {
+  //       return res.status(404).json({ message: "Phone number is available." });
+  //     }
+  //     return res.status(200).json({ message: "Phone is taken already", data: users });
+  //   } catch (error) {
+  //     return res.status(500).json({ message: "Internal Server Error!", error });
+  //   }
+  // }
 
   static async verifyUserEmail(req: Request, res: Response, next: NextFunction) {
     try {
@@ -309,33 +310,35 @@ export default class UserController {
     }
   }
 
+  // TODO COMEBACK TO COMPLETE THE VALIDATE
   static async kyc(req: Request, res: Response) {
     try {
-      const { error } = validation.kyc({ ...req.body });
-      if (error) return res.status(400).send(error.details[0].message);
+      // const { error } = validation.kyc({ ...req.body });
+      // if (error) return res.status(400).send(error.details[0].message);
 
-      // let user = await User.findOne({ email: req.body.email });
-      // if (user) return res.status(400).send({ message: "Email is taken already." });
+      let user = await User.findOne({ _id: req.body._id });
+      if (!user) return res.status(400).send({ message: "User does not exist." });
 
-      // saving verified user
+      let kycOld = await Kyc.findOne({ _id: req.body._id });
+      if (kycOld) return res.status(400).send({ message: "User has already completed their kyc." });
+
+      // // update user verified status
+      await User.updateOne({ user_id: req.body._id }, { verified: "true" });
+
       let kyc = new Kyc({ ...req.body });
       await kyc.save();
 
-      // update user verified status
-      let user = new User({ verified: "true" });
-      await user.save();
-
-      // sending user an email confirming that his account has been verified
       sendMail({
-        to: req.body.email,
+        to: user?.email as never,
         from: "Skyid",
-        name: req.body.firstName,
+        name: user?.firstName as never,
         subject: "Kyc is completed",
-        html: registration(req.body.firstName),
+        html: kycHTML(user?.firstName as never),
         text: "",
       });
-
       return res.status(200).json({ message: "success" });
+
+      // sending user an email confirming that his account has been verified
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }

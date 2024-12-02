@@ -11,3 +11,13 @@ export const database = () => {
     console.log(error, "error");
   }
 };
+
+export const KiraniDatabase = () => {
+  try {
+    const connection = mongoose.createConnection(process.env.KIRANI_MONGOOSE_URL as never);
+    console.log("Kirani Database is connected");
+    return connection;
+  } catch (error) {
+    console.log(error, "error");
+  }
+};
