@@ -1,5 +1,5 @@
-import { Response, Request, NextFunction } from "express";
-// import validation from "../utils/validation";
+import { Response, Request } from "express";
+import validation from "../utils/validation";
 import User from "../models/userModel";
 import dotenv from "dotenv";
 import UserNumber from "../models/numbersModel";
@@ -17,18 +17,21 @@ export default class NumberController {
   static async checkNumber(req: Request, res: Response) {
     const { number } = req.body;
     try {
-      // const { error } = validation.checkPhoneNumber(number);
-      // if (error) return res.status(400).send(error.details[0].message);
+      const { error } = validation.checkPhoneNumber(number);
+      if (error) return res.status(400).send(error.details[0].message);
 
       let userNumber = await UserNumber?.findOne({ number });
       // not our number
-      if (!userNumber) return res.status(400).send({ message: "number does not exist" });
+      if (!userNumber)
+        return res.status(403).send({ message: "number does not exist" });
 
       // is not available
-      if (!userNumber.available || userNumber.agentOwner)
-        return res.status(400).send({ message: "number is already taken", data: userNumber });
+      if (!userNumber.available || userNumber.usedBy || userNumber.agentOwner)
+        return res
+          .status(403)
+          .send({ message: "number is already taken", data: userNumber });
 
-      return res.status(400).send({ message: "available" });
+      return res.status(200).send({ message: "available" });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
