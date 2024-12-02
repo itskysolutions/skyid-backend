@@ -82,7 +82,7 @@ export const validation = {
 
   kyc: (kyc: IKYC) => {
     return Joi.object({
-      user_id: Joi.string().required(),
+      // user_id: Joi.string().required(),
       phone: Joi.string()
         .pattern(/^(\+?234|0)[789][01]\d{8}$/, "Nigeria phone number")
         .required()
