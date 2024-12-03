@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import UserNumber from "../models/numbersModel";
 import { IPhoneNumber } from "../types";
 import { Paystack } from "../utils/paystack";
+import SkyId from "../models/skyIdModel";
 
 dotenv.config();
 
@@ -68,7 +69,11 @@ export default class NumberController {
       const { skyId, mappedNumbers, withIVR, withIVM } = value;
 
       let amount = 20_000; // primary mapping cost
-      for (let i = 1 /* skip index 0 (primary mapping) */; i < mappedNumbers.length; i++) {
+      for (
+        let i = 1 /* skip index 0 (primary mapping) */;
+        i < mappedNumbers.length;
+        i++
+      ) {
         amount += 15_000; // additional mapping cost
       }
 
@@ -78,11 +83,25 @@ export default class NumberController {
       const user = await User.findById(req.user?._id);
       if (!user) return res.status(401).send({ message: "user not found" });
 
+      amount = amount * 100; // convert from naira to kobo
       const transaction = await Paystack.initializeTransaction(
-        (amount * 100).toString(),
+        amount.toString(),
         user.email!,
         { skyId, userId: user._id.toString() },
       );
+
+      const skyIdRecord = new SkyId({
+        skyId,
+        mappedNumbers,
+        withIVR,
+        withIVM,
+        userId: user._id,
+        status: "pending",
+        amount,
+        txnRef: transaction.reference,
+      });
+      await skyIdRecord.save();
+
       return res.status(200).send({ message: "success", data: transaction });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });

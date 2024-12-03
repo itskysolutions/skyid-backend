@@ -1,3 +1,5 @@
+import type { Types } from "mongoose";
+
 export interface IUser {
   firstName?: string;
   lastName?: string;
@@ -80,4 +82,15 @@ export interface PaystackTxnInit {
     access_code: string;
     reference: string;
   };
+}
+
+export interface ISkyId {
+  skyId: string;
+  mappedNumbers: string[];
+  withIVR: boolean;
+  withIVM: boolean;
+  userId: Types.ObjectId;
+  status: "pending" | "active" | "inactive";
+  amount: number;
+  txnRef: string;
 }
