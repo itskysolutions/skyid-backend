@@ -7,13 +7,6 @@ import { IPhoneNumber } from "../types";
 
 dotenv.config();
 
-// Extend the Request interface to include user property
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: any;
-  }
-}
-
 export default class NumberController {
   static async checkNumber(req: Request, res: Response) {
     const { number } = req.body;

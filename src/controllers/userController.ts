@@ -20,13 +20,6 @@ import Kyc from "../models/kycModel";
 
 dotenv.config();
 
-// Extend the Request interface to include user property
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: any;
-  }
-}
-
 export default class UserController {
   static async checkEmail(req: Request, res: Response, next: NextFunction) {
     const { email, firstName } = req.body;

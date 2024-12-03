@@ -7,6 +7,13 @@ import cors from "cors";
 
 dotenv.config();
 
+// Extend the Request interface to include user property
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: { _id: string };
+  }
+}
+
 const app: Application = express();
 const port: number = (process.env.PORT as never) || 8000;
 
