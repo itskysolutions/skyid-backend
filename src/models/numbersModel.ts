@@ -15,6 +15,7 @@ const numberSchema = new Schema<IPhoneNumber>({
   billingPass: String,
   agentOwner: String,
   usedBy: String,
+  platform: String,
 });
 
 // 3 Create a Model

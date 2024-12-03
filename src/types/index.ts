@@ -37,6 +37,7 @@ export interface IPhoneNumber {
   agentOwner: string | null;
   usedBy: string;
   date: Date;
+  platform?: "SKYID";
 }
 
 export interface IAddress {
@@ -74,6 +75,12 @@ export interface IBuyNumber {
   withIVM: boolean;
 }
 
+export interface BuyNumberMeta {
+  skyId: string;
+  userId: string;
+  [x: string]: unknown;
+}
+
 export interface PaystackTxnInit {
   status: boolean;
   message: string;
@@ -81,6 +88,16 @@ export interface PaystackTxnInit {
     authorization_url: string;
     access_code: string;
     reference: string;
+  };
+}
+
+export interface PaystackTxnVerify<T> {
+  status: boolean;
+  message: string;
+  data: {
+    status: string;
+    reference: string;
+    metadata: T;
   };
 }
 

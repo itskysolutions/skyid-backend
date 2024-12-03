@@ -3,7 +3,7 @@ import validation from "../utils/validation";
 import User from "../models/userModel";
 import dotenv from "dotenv";
 import UserNumber from "../models/numbersModel";
-import { IPhoneNumber } from "../types";
+import { BuyNumberMeta, IPhoneNumber } from "../types";
 import { Paystack } from "../utils/paystack";
 import SkyId from "../models/skyIdModel";
 
@@ -87,7 +87,7 @@ export default class NumberController {
       const transaction = await Paystack.initializeTransaction(
         amount.toString(),
         user.email!,
-        { skyId, userId: user._id.toString() },
+        { skyId, userId: user._id.toString() } satisfies BuyNumberMeta,
       );
 
       const skyIdRecord = new SkyId({
@@ -101,6 +101,10 @@ export default class NumberController {
         txnRef: transaction.reference,
       });
       await skyIdRecord.save();
+      await UserNumber?.updateOne(
+        { number: skyId },
+        { available: false, usedBy: user._id, platform: "SKYID" },
+      );
 
       return res.status(200).send({ message: "success", data: transaction });
     } catch (error) {

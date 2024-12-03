@@ -3,7 +3,7 @@ import type { ISkyId } from "../types";
 
 const skyIdSchema = new Schema<ISkyId>(
   {
-    skyId: String,
+    skyId: { type: String, required: true, unique: true },
     mappedNumbers: [String],
     withIVR: Boolean,
     withIVM: Boolean,

@@ -1,8 +1,15 @@
 import axios from "axios";
-import type { PaystackTxnInit } from "../types";
+import dotenv from "dotenv";
+import type { PaystackTxnInit, PaystackTxnVerify } from "../types";
+
+dotenv.config();
 
 export class Paystack {
-  private static reqHelper = axios.create({ baseURL: "https://api.paystack.co" });
+  static secretKey = process.env.PAYSTACK_SECRET_KEY as string;
+  private static reqHelper = axios.create({
+    baseURL: "https://api.paystack.co",
+    headers: { Authorization: `Bearer ${this.secretKey}` },
+  });
 
   static async initializeTransaction(
     amount: string, // amount in kobo
@@ -17,5 +24,12 @@ export class Paystack {
       throw new Error("Failed to initialize transaction");
     }
     return res.data.data;
+  }
+
+  static async verifyTransaction<T>(txnRef: string) {
+    const res = await this.reqHelper.get<PaystackTxnVerify<T>>(
+      `/transaction/verify/${txnRef}`,
+    );
+    return res.data;
   }
 }
