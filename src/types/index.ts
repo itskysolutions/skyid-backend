@@ -65,14 +65,6 @@ export interface ICheckEmail {
   otp: string;
 }
 
-// Define a custom request type that includes a user property
-export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    // Add other properties if necessary
-  };
-}
-
 export interface IBuyNumber {
   skyId: string;
   mappedNumbers: string[];
