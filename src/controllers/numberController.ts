@@ -4,6 +4,7 @@ import User from "../models/userModel";
 import dotenv from "dotenv";
 import UserNumber from "../models/numbersModel";
 import { IPhoneNumber } from "../types";
+import { Paystack } from "../utils/paystack";
 
 dotenv.config();
 
@@ -59,12 +60,30 @@ export default class NumberController {
     }
   }
 
+  // TODO: add vat to amount
   static async buyNumber(req: Request, res: Response) {
     try {
-      const guessedNumber = await User.findById(req.user?._id).select(
-        "-password -__v",
+      const { error, value } = validation.buyNumber(req.body);
+      if (error) return res.status(400).send(error.details[0].message);
+      const { skyId, mappedNumbers, withIVR, withIVM } = value;
+
+      let amount = 20_000; // primary mapping cost
+      for (let i = 1 /* skip index 0 (primary mapping) */; i < mappedNumbers.length; i++) {
+        amount += 15_000; // additional mapping cost
+      }
+
+      if (withIVR) amount += 20_000; // ivr cost
+      if (withIVM) amount += 20_000; // ivm cost
+
+      const user = await User.findById(req.user?._id);
+      if (!user) return res.status(401).send({ message: "user not found" });
+
+      const transaction = await Paystack.initializeTransaction(
+        (amount * 100).toString(),
+        user.email!,
+        { skyId, userId: user._id.toString() },
       );
-      return res.status(200).json({ message: "success", data: guessedNumber });
+      return res.status(200).send({ message: "success", data: transaction });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }

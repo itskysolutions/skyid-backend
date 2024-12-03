@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ICheckEmail, IKYC, IOtp, IUser } from "../types";
+import { IBuyNumber, ICheckEmail, IKYC, IOtp, IUser } from "../types";
 
 export const validation = {
   checkEmail: (email: string) => {
@@ -16,6 +16,23 @@ export const validation = {
         })
         .validate(number)
     );
+  },
+
+  buyNumber: (payload: IBuyNumber) => {
+    return Joi.object<IBuyNumber>({
+      skyId: Joi.string()
+        // .pattern(/^(\+?234|0)[789][01]\d{8}$/, "Nigeria phone number")
+        .required()
+        .messages({
+          "string.pattern.name": "Phone number must be a valid Nigerian phone number",
+          "string.base": "Phone number must be a string",
+          "string.empty": "Phone number is required",
+          "any.required": "Phone number is required",
+        }),
+      mappedNumbers: Joi.array().items(Joi.string()).min(1).required(),
+      withIVR: Joi.boolean().required(),
+      withIVM: Joi.boolean().required(),
+    }).validate(payload);
   },
 
   signIn: (signin: IUser) => {

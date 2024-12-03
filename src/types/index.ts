@@ -72,3 +72,20 @@ export interface AuthenticatedRequest extends Request {
     // Add other properties if necessary
   };
 }
+
+export interface IBuyNumber {
+  skyId: string;
+  mappedNumbers: string[];
+  withIVR: boolean;
+  withIVM: boolean;
+}
+
+export interface PaystackTxnInit {
+  status: boolean;
+  message: string;
+  data: {
+    authorization_url: string;
+    access_code: string;
+    reference: string;
+  };
+}
