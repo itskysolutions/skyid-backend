@@ -7,10 +7,7 @@ import SkyId from "../models/skyIdModel";
 export default class WebhookController {
   static async paystackWebhook(req: Request, res: Response) {
     //validate event
-    const hash = crypto
-      .createHmac("sha512", Paystack.secretKey)
-      .update(JSON.stringify(req.body))
-      .digest("hex");
+    const hash = crypto.createHmac("sha512", Paystack.secretKey).update(JSON.stringify(req.body)).digest("hex");
 
     res.send(200);
 
@@ -22,18 +19,13 @@ export default class WebhookController {
     // handle event
     if (req.body.event === "charge.success") {
       // update skyid status
-      const { status, data } = await Paystack.verifyTransaction<BuyNumberMeta>(
-        req.body.data.reference,
-      );
+      const { status, data } = await Paystack.verifyTransaction<BuyNumberMeta>(req.body.data.reference);
       if (!status) {
         console.log("Failed to verify transaction");
         return;
       }
 
-      await SkyId.updateOne(
-        { skyId: data.metadata.skyId },
-        { status: "active" },
-      );
+      await SkyId.updateOne({ skyId: data.metadata.skyId }, { status: "active" });
     } else {
       console.log("Received paystack webhook event: ", req.body.event);
     }

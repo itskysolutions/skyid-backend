@@ -18,14 +18,11 @@ export default class NumberController {
 
       let userNumber = await UserNumber?.findOne({ number });
       // not our number
-      if (!userNumber)
-        return res.status(403).send({ message: "number does not exist" });
+      if (!userNumber) return res.status(403).send({ message: "number does not exist" });
 
       // is not available
       if (!userNumber.available || userNumber.usedBy || userNumber.agentOwner)
-        return res
-          .status(403)
-          .send({ message: "number is already taken", data: userNumber });
+        return res.status(403).send({ message: "number is already taken", data: userNumber });
 
       return res.status(200).send({ message: "available" });
     } catch (error) {
@@ -41,16 +38,13 @@ export default class NumberController {
         return res.status(400).send({ message: "Invalid suggestion count" });
       }
 
-      const suggestedNumbers: Array<IPhoneNumber> | undefined =
-        await UserNumber?.aggregate([
-          { $match: { available: true, usedBy: null, agentOwner: null } },
-          { $sample: { size: suggestionCount } }, // select random numbers
-        ]);
+      const suggestedNumbers: Array<IPhoneNumber> | undefined = await UserNumber?.aggregate([
+        { $match: { available: true, usedBy: null, agentOwner: null } },
+        { $sample: { size: suggestionCount } }, // select random numbers
+      ]);
 
       if (!suggestedNumbers || suggestedNumbers.length === 0) {
-        console.log(
-          "EMERGENCY: There are no available phone numbers in the database.",
-        );
+        console.log("EMERGENCY: There are no available phone numbers in the database.");
         return res.status(500).send({ message: "please try again later" });
       }
 
@@ -69,11 +63,7 @@ export default class NumberController {
       const { skyId, mappedNumbers, withIVR, withIVM } = value;
 
       let amount = 20_000; // primary mapping cost
-      for (
-        let i = 1 /* skip index 0 (primary mapping) */;
-        i < mappedNumbers.length;
-        i++
-      ) {
+      for (let i = 1 /* skip index 0 (primary mapping) */; i < mappedNumbers.length; i++) {
         amount += 15_000; // additional mapping cost
       }
 
@@ -84,11 +74,10 @@ export default class NumberController {
       if (!user) return res.status(401).send({ message: "user not found" });
 
       amount = amount * 100; // convert from naira to kobo
-      const transaction = await Paystack.initializeTransaction(
-        amount.toString(),
-        user.email!,
-        { skyId, userId: user._id.toString() } satisfies BuyNumberMeta,
-      );
+      const transaction = await Paystack.initializeTransaction(amount.toString(), user.email!, {
+        skyId,
+        userId: user._id.toString(),
+      } satisfies BuyNumberMeta);
 
       const skyIdRecord = new SkyId({
         skyId,
@@ -101,34 +90,11 @@ export default class NumberController {
         txnRef: transaction.reference,
       });
       await skyIdRecord.save();
-      await UserNumber?.updateOne(
-        { number: skyId },
-        { available: false, usedBy: user._id, platform: "SKYID" },
-      );
+      await UserNumber?.updateOne({ number: skyId }, { available: false, usedBy: user._id, platform: "SKYID" });
 
       return res.status(200).send({ message: "success", data: transaction });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
   }
-
-  // static async guessedNumbers(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     const guessedNumber = await User.findById(req.user?._id).select("-password -__v");
-  //     return res.status(200).json({ message: "success", data: guessedNumber });
-  //   } catch (error) {
-  //     return res.status(500).json({ message: "Internal Server Error!" });
-  //   }
-  //   next();
-  // }
-
-  // static async buyNumber(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     const guessedNumber = await User.findById(req.user?._id).select("-password -__v");
-  //     return res.status(200).json({ message: "success", data: guessedNumber });
-  //   } catch (error) {
-  //     return res.status(500).json({ message: "Internal Server Error!" });
-  //   }
-  //   next();
-  // }
 }

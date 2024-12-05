@@ -28,6 +28,22 @@ export interface IKYC {
   date?: Date;
 }
 
+export interface IWallet {
+  accountNumber: string;
+  amount: string;
+  status: string;
+  date?: Date;
+}
+
+export interface IDeposit {
+  refId: string;
+  type: string;
+  // accountNumber: string;
+  amount: string;
+  status: string;
+  date?: Date;
+}
+
 export interface IPhoneNumber {
   number: string;
   accountId: string;

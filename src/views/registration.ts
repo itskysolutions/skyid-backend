@@ -65,3 +65,17 @@ export const kycHTML = (name: string) => {
   <p>The SKYID Team</p>
   </body>`;
 };
+
+export const depositMoneyTemplate = (name: string, amount: string) => {
+  return `
+  <body>
+    <h4>Hello ${name},</h4>
+    <h2>Deposit Successful!</h2>
+    <p>We are pleased to inform you that an amount of ${amount} has been successfully deposited into your wallet.</p>
+    <p>You can now use these funds for various transactions and services available on our platform.</p>
+    <p>If you have any questions or encounter any issues, please do not hesitate to reach out to our support team at [Support Email] or call us at [Support Phone Number].</p>
+    <p>Thank you for choosing our services.</p>
+    <p>Best regards,</p>
+    <p>The SKYID Team</p>
+  </body>`;
+};
