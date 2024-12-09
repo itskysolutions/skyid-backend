@@ -6,6 +6,17 @@ export const validation = {
     return Joi.string().email().validate(email);
   },
 
+  checkId: (_id: string) => {
+    return (
+      Joi.string()
+        // .pattern(/^\d+$/)
+        .messages({
+          "string.pattern.base": "_id is required.",
+          "string.empty": "_id is required.",
+        })
+        .validate(_id)
+    );
+  },
   checkPhoneNumber: (number: string) => {
     return (
       Joi.string()
@@ -32,6 +43,7 @@ export const validation = {
       mappedNumbers: Joi.array().items(Joi.string()).min(1).required(),
       withIVR: Joi.boolean().required(),
       withIVM: Joi.boolean().required(),
+      _id: Joi.string().required(),
     }).validate(payload);
   },
 

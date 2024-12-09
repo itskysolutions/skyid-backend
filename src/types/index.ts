@@ -85,6 +85,7 @@ export interface ICheckEmail {
 }
 
 export interface IBuyNumber {
+  _id: string;
   skyId: string;
   mappedNumbers: string[];
   withIVR: boolean;
@@ -120,10 +121,12 @@ export interface PaystackTxnVerify<T> {
 export interface ISkyId {
   skyId: string;
   mappedNumbers: string[];
-  withIVR: boolean;
-  withIVM: boolean;
+  withIVR: boolean | object;
+  withIVM: boolean | object;
   userId: Types.ObjectId;
   status: "pending" | "active" | "inactive";
   amount: number;
   txnRef: string;
+  currentDate?: any;
+  renewal?: any;
 }

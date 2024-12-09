@@ -15,8 +15,16 @@ const skyIdSchema = new Schema<ISkyId>(
     },
     amount: Number,
     txnRef: String,
+    renewal: {
+      type: Date,
+      default: () => {
+        const date = new Date();
+        date.setFullYear(date.getFullYear() + 1);
+        return date;
+      },
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const SkyId = model("skyId", skyIdSchema);

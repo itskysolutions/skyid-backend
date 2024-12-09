@@ -21,8 +21,9 @@ export default class NumberController {
       if (!userNumber) return res.status(403).send({ message: "number does not exist" });
 
       // is not available
-      if (!userNumber.available || userNumber.usedBy || userNumber.agentOwner)
-        return res.status(403).send({ message: "number is already taken", data: userNumber });
+      console.log(userNumber, "logs");
+      // if (!userNumber.available || userNumber.usedBy || userNumber.agentOwner)
+      if (!userNumber.available) return res.status(403).send({ message: "number is already taken", data: userNumber });
 
       return res.status(200).send({ message: "available" });
     } catch (error) {
@@ -70,7 +71,7 @@ export default class NumberController {
       if (withIVR) amount += 20_000; // ivr cost
       if (withIVM) amount += 20_000; // ivm cost
 
-      const user = await User.findById(req.user?._id);
+      const user = await User.findById(req.body?._id);
       if (!user) return res.status(401).send({ message: "user not found" });
 
       amount = amount * 100; // convert from naira to kobo
@@ -93,6 +94,63 @@ export default class NumberController {
       await UserNumber?.updateOne({ number: skyId }, { available: false, usedBy: user._id, platform: "SKYID" });
 
       return res.status(200).send({ message: "success", data: transaction });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!" });
+    }
+  }
+
+  static async getUserNumbers(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      const { error } = validation.checkPhoneNumber(id);
+      if (error) return res.status(400).send(error.details[0].message);
+
+      let skyIdNumber = await SkyId?.findOne({ userId: id });
+      if (!skyIdNumber) return res.status(403).send({ message: "number does not exist" });
+
+      return res.status(200).send({ message: "success", data: skyIdNumber });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!" });
+    }
+  }
+
+  static async replaceBuyNumber(req: Request, res: Response) {
+    const { id } = req.params;
+    const { current_number, new_number } = req.body;
+    try {
+      const { error } = validation.checkPhoneNumber(id);
+      if (error) return res.status(400).send(error.details[0].message);
+
+      let skyIdNumber = await SkyId?.findOne({ userId: id });
+      if (!skyIdNumber) return res.status(403).send({ message: "number does not exist" });
+
+      if (!skyIdNumber.mappedNumbers.includes(current_number))
+        //check current_number exist
+        return res.status(403).send({ message: "mapped number does not exist" });
+
+      let number = skyIdNumber.mappedNumbers.map((number) => (number === current_number ? new_number : number)); // find and replace number
+      await SkyId.findOneAndUpdate(
+        { userId: id },
+        {
+          $set: { mappedNumbers: number },
+        }
+      );
+      return res.status(200).send({ message: "success", data: skyIdNumber });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!" });
+    }
+  }
+
+  static async getUserNumbersTransactionHistory(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      const { error } = validation.checkPhoneNumber(id);
+      if (error) return res.status(400).send(error.details[0].message);
+
+      let skyIdNumber = await SkyId?.findOne({ userId: id });
+      if (!skyIdNumber) return res.status(403).send({ message: "number does not exist" });
+
+      return res.status(200).send({ message: "success", data: skyIdNumber });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
