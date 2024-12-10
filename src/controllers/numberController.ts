@@ -20,12 +20,12 @@ export default class NumberController {
       // not our number
       if (!userNumber) return res.status(403).send({ message: "number does not exist" });
 
-      // is not available
-      console.log(userNumber, "logs");
+      // console.log(userNumber.available, "logs");
       // if (!userNumber.available || userNumber.usedBy || userNumber.agentOwner)
-      if (!userNumber.available) return res.status(403).send({ message: "number is already taken", data: userNumber });
+      if (userNumber.available === "false")
+        return res.status(403).send({ message: "number is already taken", data: userNumber?.number });
 
-      return res.status(200).send({ message: "available" });
+      return res.status(200).send({ message: "available", data: userNumber.available });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
@@ -113,6 +113,20 @@ export default class NumberController {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
   }
+  static async sendSwitchBuyNumberRequest(req: Request, res: Response) {
+    const { id, skyid, mappedNumber, request_type, account_type, status, network_type } = req.body;
+    try {
+      const { error } = validation.checkPhoneNumber(id);
+      if (error) return res.status(400).send(error.details[0].message);
+
+      let skyIdNumber = await SkyId?.findOne({ userId: id });
+      if (!skyIdNumber) return res.status(403).send({ message: "number does not exist" });
+
+      return res.status(200).send({ message: "success", data: skyIdNumber });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!" });
+    }
+  }
 
   static async replaceBuyNumber(req: Request, res: Response) {
     const { id } = req.params;
@@ -124,8 +138,12 @@ export default class NumberController {
       let skyIdNumber = await SkyId?.findOne({ userId: id });
       if (!skyIdNumber) return res.status(403).send({ message: "number does not exist" });
 
+      //check current_number exist
+
+      // console.log(skyIdNumber.mappedNumbers, "mapped");
+      // console.log(current_number, "logs");
+
       if (!skyIdNumber.mappedNumbers.includes(current_number))
-        //check current_number exist
         return res.status(403).send({ message: "mapped number does not exist" });
 
       let number = skyIdNumber.mappedNumbers.map((number) => (number === current_number ? new_number : number)); // find and replace number

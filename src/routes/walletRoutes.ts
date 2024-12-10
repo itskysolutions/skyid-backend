@@ -3,7 +3,8 @@ import WalletController from "../controllers/walletController";
 
 const WalletRoutes = express.Router();
 
+WalletRoutes.post("/create", WalletController.wallet);
+WalletRoutes.get("/:userId", WalletController.getWallet);
 WalletRoutes.post("/deposit", WalletController.deposit);
-WalletRoutes.post("/create-wallet", WalletController.wallet);
 
 export default WalletRoutes;

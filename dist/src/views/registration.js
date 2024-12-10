@@ -1,5 +1,8 @@
-export const registration = (name: string) => {
-  return `<body>
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.depositMoneyTemplate = exports.kycHTML = exports.verifyEmailTemplate = exports.resetPasswordTemplate = exports.forgotPasswordTemplate = exports.registration = void 0;
+const registration = (name) => {
+    return `<body>
   <h4>Hello ${name},</h4>
   <h2>Welcome to SkyID! 😀</h2>
   <p>We are delighted to have you on board. As a registered user</p>
@@ -8,9 +11,9 @@ export const registration = (name: string) => {
   <p>The SkyID Team</p>
   </body>`;
 };
-
-export const forgotPasswordTemplate = (name: string, otp: string) => {
-  return `<body>
+exports.registration = registration;
+const forgotPasswordTemplate = (name, otp) => {
+    return `<body>
   <h4>Hello ${name},</h4>
   <h2>Reset your password</h2>
   <p>We received a request to reset the password associated with your account. Please use the One-Time Password (OTP) provided below to complete your password reset process.</p>
@@ -21,8 +24,9 @@ export const forgotPasswordTemplate = (name: string, otp: string) => {
   <p>SKYID support Team</p>
   </body>`;
 };
-export const resetPasswordTemplate = (name: string) => {
-  return `<body>
+exports.forgotPasswordTemplate = forgotPasswordTemplate;
+const resetPasswordTemplate = (name) => {
+    return `<body>
   <h4>Hello ${name},</h4>
   <h2>Password Reset Successful</h2>
   <p>Your SkyID account password has been successfully reset.</p>
@@ -30,9 +34,9 @@ export const resetPasswordTemplate = (name: string) => {
   <p>Best regards,<br/>SKYID Support Team</p>
   </body>`;
 };
-
-export const verifyEmailTemplate = (name: string, otp: string) => {
-  return `<body>
+exports.resetPasswordTemplate = resetPasswordTemplate;
+const verifyEmailTemplate = (name, otp) => {
+    return `<body>
   <h4>Hello ${name},</h4>
   <h2>Verify otp code</h2>
   <p>Please use the One-Time Password (OTP) provided below to verify your account.</p>
@@ -43,9 +47,9 @@ export const verifyEmailTemplate = (name: string, otp: string) => {
   <p>The SKYID Team</p>
   </body>`;
 };
-
-export const kycHTML = (name: string) => {
-  return `<body>
+exports.verifyEmailTemplate = verifyEmailTemplate;
+const kycHTML = (name) => {
+    return `<body>
   <h4>Hello ${name},</h4>
   <h2>Congratulations! Your KYC is Completed</h2>
   
@@ -59,9 +63,9 @@ export const kycHTML = (name: string) => {
   <p>The SKYID Team</p>
   </body>`;
 };
-
-export const depositMoneyTemplate = (name: string, amount: string) => {
-  return `
+exports.kycHTML = kycHTML;
+const depositMoneyTemplate = (name, amount) => {
+    return `
   <body>
     <h4>Hello ${name},</h4>
     <h2>Deposit Successful!</h2>
@@ -73,3 +77,5 @@ export const depositMoneyTemplate = (name: string, amount: string) => {
     <p>The SKYID Team</p>
   </body>`;
 };
+exports.depositMoneyTemplate = depositMoneyTemplate;
+//# sourceMappingURL=registration.js.map
