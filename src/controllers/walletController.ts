@@ -73,6 +73,27 @@ export default class WalletController {
     }
   }
 
+  static async getWalletHistory(req: Request, res: Response) {
+    try {
+      const accountNumber = req.params.userId;
+
+      // // Find the user
+      // const user = await User.findOne({ _id: userId });
+      // if (!user) {
+      //   return res.status(404).json({ message: "User not found" });
+      // }
+
+      // Retrieve the transaction history
+      console.log(accountNumber, "account number");
+      const history = await Deposit.find({ accountNumber }).sort({ date: -1 });
+      console.log(history, "history");
+
+      return res.status(200).json({ message: "success", data: history });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error!" });
+    }
+  }
+
   static async deposit(req: Request, res: Response) {
     try {
       // const { error } = validation.kyc({ ...req.body });
@@ -81,7 +102,7 @@ export default class WalletController {
       let user = await User.findOne({ _id: req.body._id });
       if (!user) return res.status(400).send({ message: "User does not exist." });
 
-      let wallet = await Wallet.findOne({ _id: req.body._id });
+      let wallet = await Wallet.findOne({ accountNumber: req.body.accountNumber });
       if (!wallet) return res.status(400).send({ message: "This account does not have a wallet" });
 
       await Wallet.updateOne({ _id: req.body._id }, { amount: `${Number(wallet.amount) + Number(req.body.amount)}` });
@@ -104,4 +125,45 @@ export default class WalletController {
       return res.status(500).json({ message: "Internal Server Error!" });
     }
   }
+
+  // static async withdraw(req: Request, res: Response) {
+  //   try {
+  //     const userId = req.body._id;
+  //     const amountToWithdraw = Number(req.body.amount);
+
+  //     // Find the user
+  //     const user = await User.findOne({ _id: userId });
+  //     if (!user) {
+  //       return res.status(404).json({ message: "User not found" });
+  //     }
+
+  //     // Find the wallet
+  //     const wallet = await Wallet.findOne({ _id: userId });
+  //     if (!wallet) {
+  //       return res.status(404).json({ message: "Wallet not found for this user" });
+  //     }
+
+  //     // Check if the wallet has sufficient balance
+  //     if (wallet.amount < amountToWithdraw) {
+  //       return res.status(400).json({ message: "Insufficient balance" });
+  //     }
+
+  //     // Update the wallet balance
+  //     wallet.amount -= amountToWithdraw;
+  //     await wallet.save();
+
+  //     // Record the withdrawal in the history
+  //     const withdrawal = new Deposit({
+  //       userId,
+  //       amount: -amountToWithdraw, // Negative amount for withdrawal
+  //       type: "withdrawal",
+  //       date: new Date(),
+  //     });
+  //     await withdrawal.save();
+
+  //     return res.status(200).json({ message: "Withdrawal successful", balance: wallet.amount });
+  //   } catch (error) {
+  //     return res.status(500).json({ message: "Internal Server Error!" });
+  //   }
+  // }
 }

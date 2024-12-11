@@ -38,7 +38,7 @@ export interface IWallet {
 export interface IDeposit {
   refId: string;
   type: string;
-  // accountNumber: string;
+  accountNumber: string;
   amount: string;
   status: string;
   date?: Date;

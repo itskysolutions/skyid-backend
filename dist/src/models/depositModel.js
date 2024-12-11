@@ -4,7 +4,7 @@ const mongoose_1 = require("mongoose");
 // 2. Create a Schema corresponding to the document interface.
 const depositSchema = new mongoose_1.Schema({
     refId: String,
-    // accountNumber: String,
+    accountNumber: String,
     type: String,
     amount: String,
     status: String,

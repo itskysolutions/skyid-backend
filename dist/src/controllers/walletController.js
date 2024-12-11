@@ -69,6 +69,24 @@ class WalletController {
             return res.status(500).json({ message: "Internal Server Error!" });
         }
     }
+    static async getWalletHistory(req, res) {
+        try {
+            const accountNumber = req.params.userId;
+            // // Find the user
+            // const user = await User.findOne({ _id: userId });
+            // if (!user) {
+            //   return res.status(404).json({ message: "User not found" });
+            // }
+            // Retrieve the transaction history
+            console.log(accountNumber, "account number");
+            const history = await depositModel_1.default.find({ accountNumber }).sort({ date: -1 });
+            console.log(history, "history");
+            return res.status(200).json({ message: "success", data: history });
+        }
+        catch (error) {
+            return res.status(500).json({ message: "Internal Server Error!" });
+        }
+    }
     static async deposit(req, res) {
         try {
             // const { error } = validation.kyc({ ...req.body });
@@ -76,7 +94,7 @@ class WalletController {
             let user = await userModel_1.default.findOne({ _id: req.body._id });
             if (!user)
                 return res.status(400).send({ message: "User does not exist." });
-            let wallet = await walletModel_1.default.findOne({ _id: req.body._id });
+            let wallet = await walletModel_1.default.findOne({ accountNumber: req.body.accountNumber });
             if (!wallet)
                 return res.status(400).send({ message: "This account does not have a wallet" });
             await walletModel_1.default.updateOne({ _id: req.body._id }, { amount: `${Number(wallet.amount) + Number(req.body.amount)}` });

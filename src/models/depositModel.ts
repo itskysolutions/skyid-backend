@@ -4,7 +4,7 @@ import { IDeposit } from "../types";
 // 2. Create a Schema corresponding to the document interface.
 const depositSchema = new Schema<IDeposit>({
   refId: String,
-  // accountNumber: String,
+  accountNumber: String,
   type: String,
   amount: String,
   status: String,

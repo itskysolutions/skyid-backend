@@ -8,6 +8,7 @@ const walletController_1 = __importDefault(require("../controllers/walletControl
 const WalletRoutes = express_1.default.Router();
 WalletRoutes.post("/create", walletController_1.default.wallet);
 WalletRoutes.get("/:userId", walletController_1.default.getWallet);
+WalletRoutes.get("/history/:userId", walletController_1.default.getWalletHistory);
 WalletRoutes.post("/deposit", walletController_1.default.deposit);
 exports.default = WalletRoutes;
 //# sourceMappingURL=walletRoutes.js.map
